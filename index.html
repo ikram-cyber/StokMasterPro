@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stok Master Pro</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f766e">
+    <style>
+        :root { --primary: #0f766e; --success: #16a34a; --danger: #dc2626; --warn: #ca8a04; --bg: #f3f4f6; --text: #1f2937; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; padding-bottom: 80px; }
+        
+        .card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; }
+        .dash-box { background: linear-gradient(135deg, var(--primary), #115e59); color: white; padding: 20px; border-radius: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .dash-item { text-align: center; }
+        .dash-item h2 { margin: 5px 0 0 0; font-size: 28px; }
+        
+        h3 { margin-top: 0; color: var(--primary); border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; font-size: 16px; }
+        input, select, button { width: 100%; padding: 10px; margin: 6px 0; border-radius: 6px; border: 1px solid #d1d5db; box-sizing: border-box; font-size: 14px; }
+        input:focus, select:focus { border-color: var(--primary); outline: none; }
+        
+        .btn-row { display: flex; gap: 10px; }
+        .btn-main { background: var(--primary); color: white; border: none; font-weight: bold; }
+        .btn-in { background: var(--success); color: white; border: none; font-weight: bold; flex: 1; }
+        .btn-out { background: var(--danger); color: white; border: none; font-weight: bold; flex: 1; }
+        .btn-print { background: #4b5563; color: white; border: none; font-weight: bold; }
+        .btn-excel { background: #16a34a; color: white; border: none; font-weight: bold; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+        th, td { padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: left; }
+        th { background: #f9fafb; font-weight: 600; }
+        .badge-warn { background: #fef08a; color: #854d0e; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+        .text-right { text-align: right; }
+        
+        .page { display: none; animation: fadeIn 0.3s ease; } .page.active { display: block; }
+        @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+        
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 10px 5px; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); z-index: 100; }
+        .nav-item { border: none; background: none; font-size: 11px; color: #9ca3af; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 5px; width: 20%; }
+        .nav-item.active { color: var(--primary); font-weight: bold; }
+        .nav-item i { font-size: 18px; margin-bottom: 2px; font-style: normal; }
+
+        .header-print { display: none; text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; }
+
+        @media print {
+            body { background: white; padding: 0; font-size: 12pt; }
+            .card { box-shadow: none; border: none; padding: 0; }
+            .no-print, .bottom-nav { display: none !important; }
+            .header-print { display: block; }
+            table, th, td { border-color: #000; color: #000; }
+            th { background: #f3f4f6 !important; -webkit-print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="p-home" class="page active">
+    <div class="dash-box">
+        <div class="dash-item"><p style="margin:0; font-size:12px;">Total Item</p><h2 id="v-total-item">0</h2></div>
+        <div class="dash-item"><p style="margin:0; font-size:12px;">Total Stok Fisik</p><h2 id="v-total-stok">0</h2></div>
+        <div class="dash-item"><p style="margin:0; font-size:12px; color:#fef08a;">Stok Menipis</p><h2 id="v-total-kritis" style="color:#fef08a;">0</h2></div>
+    </div>
+    
+    <div class="card">
+        <h3>Peringatan Stok Menipis (Limit &lt; 5)</h3>
+        <div style="overflow-x:auto;"><div id="view-kritis"></div></div>
+    </div>
+</div>
+
+<div id="p-master" class="page">
+    <div class="card no-print">
+        <h3>+ Tambah Barang Baru</h3>
+        <input type="text" id="m-sku" placeholder="SKU / Kode Barang (Contoh: BRG-001)">
+        <input type="text" id="m-nama" placeholder="Nama Barang">
+        <input type="text" id="m-kat" placeholder="Kategori (Contoh: Elektronik, Makanan)">
+        <button class="btn-main" onclick="tambahBarang()">Simpan Master Barang</button>
+    </div>
+    <div class="card">
+        <h3>Daftar Master Barang</h3>
+        <input type="text" class="no-print" id="cari-master" placeholder="🔍 Cari nama/kode barang..." onkeyup="tampilMaster()">
+        <div style="overflow-x:auto;"><div id="view-master"></div></div>
+    </div>
+</div>
+
+<div id="p-trx" class="page no-print">
+    <div class="card">
+        <h3>Input Mutasi Stok</h3>
+        <label style="font-size:12px; font-weight:bold;">Pilih Barang:</label>
+        <select id="t-sku"></select>
+        
+        <label style="font-size:12px; font-weight:bold; margin-top:10px; display:block;">Tanggal Transaksi:</label>
+        <input type="date" id="t-tgl">
+        
+        <label style="font-size:12px; font-weight:bold; margin-top:10px; display:block;">Jumlah Qty:</label>
+        <input type="number" id="t-qty" placeholder="Jumlah barang">
+        
+        <label style="font-size:12px; font-weight:bold; margin-top:10px; display:block;">Keterangan / Referensi:</label>
+        <input type="text" id="t-ket" placeholder="Contoh: PO-001 / Retur / Terjual">
+        
+        <div class="btn-row" style="margin-top:15px;">
+            <button class="btn-in" onclick="catatTrx('in')">📥 MASUK (In)</button>
+            <button class="btn-out" onclick="catatTrx('out')">📤 KELUAR (Out)</button>
+        </div>
+    </div>
+</div>
+
+<div id="p-lap" class="page">
+    <div class="card">
+        <div class="header-print">
+            <h2 id="kop-toko">NAMA GUDANG</h2>
+            <p style="margin:5px 0 0 0;">LAPORAN KARTU STOK (STOCK CARD)</p>
+            <p style="margin:5px 0 0 0; font-size:12px;" id="kop-tgl"></p>
+        </div>
+
+        <div class="no-print">
+            <h3>Laporan Mutasi Stok</h3>
+            <label style="font-size:12px; font-weight:bold;">Filter Barang:</label>
+            <select id="l-sku" onchange="tampilLaporan()">
+                <option value="Semua">Semua Barang</option>
+            </select>
+            <div class="btn-row" style="margin-top:10px; margin-bottom:15px;">
+                <button class="btn-print" onclick="window.print()">🖨️ Cetak PDF</button>
+                <button class="btn-excel" onclick="exportExcel()">📊 Export Excel</button>
+            </div>
+        </div>
+
+        <div style="overflow-x:auto;"><div id="view-lap"></div></div>
+    </div>
+</div>
+
+<div id="p-seting" class="page no-print">
+    <div class="card">
+        <h3>Pengaturan Sistem</h3>
+        <label style="font-size:12px; font-weight:bold;">Nama Gudang / Perusahaan:</label>
+        <input type="text" id="set-gudang" placeholder="Contoh: Gudang Utama PT. ABC" oninput="simpanSet()">
+        <hr style="margin:20px 0; border:0; border-top:1px solid #e5e7eb;">
+        <button onclick="if(confirm('YAKIN HAPUS SEMUA DATA MASTER & TRANSAKSI STOK?')) { localStorage.clear(); location.reload(); }" style="background:var(--danger); color:white;">⚠️ HAPUS SEMUA DATA GUDANG</button>
+    </div>
+</div>
+
+<div class="bottom-nav">
+    <button class="nav-item active" onclick="bukaTab('home')"><i>🏠</i>Dash</button>
+    <button class="nav-item" onclick="bukaTab('master')"><i>📦</i>Master</button>
+    <button class="nav-item" onclick="bukaTab('trx')"><i>🔄</i>Mutasi</button>
+    <button class="nav-item" onclick="bukaTab('lap')"><i>📋</i>Laporan</button>
+    <button class="nav-item" onclick="bukaTab('seting')"><i>⚙️</i>Seting</button>
+</div>
+
+<script>
+    // Inisialisasi Database Lokal
+    let db_barang = JSON.parse(localStorage.getItem('smpro_barang')) || [];
+    let db_trx = JSON.parse(localStorage.getItem('smpro_trx')) || [];
+    
+    // Setup Tanggal Aman (Anti Masa Depan)
+    let dateObj = new Date();
+    let offset = dateObj.getTimezoneOffset() * 60000;
+    let localISOTime = (new Date(dateObj - offset)).toISOString().slice(0, 10);
+    document.getElementById('t-tgl').value = localISOTime;
+    document.getElementById('t-tgl').setAttribute('max', localISOTime);
+
+    function simpanBarang() { localStorage.setItem('smpro_barang', JSON.stringify(db_barang)); }
+    function simpanTrx() { localStorage.setItem('smpro_trx', JSON.stringify(db_trx)); }
+    function simpanSet() { localStorage.setItem('smpro_gudang', document.getElementById('set-gudang').value); updateKop(); }
+
+    function updateKop() {
+        let gudang = localStorage.getItem('smpro_gudang') || "GUDANG PERUSAHAAN";
+        document.getElementById('set-gudang').value = localStorage.getItem('smpro_gudang') || "";
+        document.getElementById('kop-toko').innerText = gudang.toUpperCase();
+        document.getElementById('kop-tgl').innerText = "Dicetak: " + new Date().toLocaleString('id-ID');
+    }
+
+    // HITUNG STOK AKTUAL (Rumus: Masuk - Keluar)
+    function getStokAkhir(sku) {
+        let mutasi = db_trx.filter(x => x.sku === sku);
+        let masuk = 0, keluar = 0;
+        mutasi.forEach(m => { if(m.jen === 'in') masuk += m.qty; else keluar += m.qty; });
+        return masuk - keluar;
+    }
+
+    // TAMBAH MASTER BARANG
+    function tambahBarang() {
+        let sku = document.getElementById('m-sku').value.trim().toUpperCase();
+        let nama = document.getElementById('m-nama').value.trim();
+        let kat = document.getElementById('m-kat').value.trim() || "Umum";
+        
+        if(!sku || !nama) return alert("SKU dan Nama Barang wajib diisi!");
+        if(db_barang.find(x => x.sku === sku)) return alert("SKU sudah ada! Gunakan kode lain.");
+        
+        db_barang.push({sku: sku, nama: nama, kat: kat});
+        document.getElementById('m-sku').value = ""; document.getElementById('m-nama').value = ""; document.getElementById('m-kat').value = "";
+        simpanBarang(); refreshSemua(); alert("Barang berhasil ditambahkan!");
+    }
+
+    // TAMPIL DAFTAR BARANG
+    function tampilMaster() {
+        let cari = document.getElementById('cari-master').value.toLowerCase();
+        let hasil = db_barang.filter(x => x.sku.toLowerCase().includes(cari) || x.nama.toLowerCase().includes(cari));
+        
+        let html = "<table><tr><th>SKU</th><th>Nama Barang</th><th>Kategori</th><th class='text-right'>Stok Fisik</th></tr>";
+        if(hasil.length === 0) html += "<tr><td colspan='4' align='center'>Data kosong</td></tr>";
+        
+        hasil.forEach(x => {
+            let stok = getStokAkhir(x.sku);
+            let warnaStok = stok <= 5 ? "color:var(--danger); font-weight:bold;" : "color:var(--success); font-weight:bold;";
+            html += `<tr><td><b>${x.sku}</b></td><td>${x.nama}</td><td>${x.kat}</td><td class='text-right' style='${warnaStok}'>${stok}</td></tr>`;
+        });
+        html += "</table>";
+        document.getElementById('view-master').innerHTML = html;
+    }
+
+    // INPUT TRANSAKSI (MUTASI)
+    function catatTrx(jen) {
+        let sku = document.getElementById('t-sku').value;
+        let tgl = document.getElementById('t-tgl').value;
+        let qty = parseInt(document.getElementById('t-qty').value);
+        let ket = document.getElementById('t-ket').value || "-";
+        
+        if(!sku) return alert("Pilih barang terlebih dahulu! Kalau kosong, isi Master Barang dulu.");
+        if(!qty || qty <= 0) return alert("Jumlah Qty tidak valid!");
+        if(tgl > localISOTime) { alert("ERROR SISTEM: Tidak bisa menginput untuk tanggal masa depan!"); document.getElementById('t-tgl').value = localISOTime; return; }
+        
+        // Validasi Keluar (Out) tidak boleh minus
+        if(jen === 'out') {
+            let stokSkrg = getStokAkhir(sku);
+            if(qty > stokSkrg) return alert(`Stok tidak cukup! Sisa fisik hanya ${stokSkrg}.`);
+        }
+
+        db_trx.push({ tgl: tgl, sku: sku, jen: jen, qty: qty, ket: ket, id: Date.now() });
+        document.getElementById('t-qty').value = ""; document.getElementById('t-ket').value = "";
+        simpanTrx(); refreshSemua(); alert(`Transaksi ${jen === 'in' ? 'MASUK' : 'KELUAR'} berhasil dicatat!`);
+    }
+
+    // TAMPIL LAPORAN KARTU STOK
+    function tampilLaporan() {
+        let filterSku = document.getElementById('l-sku').value;
+        let dataTrx = filterSku === 'Semua' ? db_trx : db_trx.filter(x => x.sku === filterSku);
+        
+        // Sort by Date
+        dataTrx.sort((a,b) => new Date(a.tgl) - new Date(b.tgl));
+
+        let html = "<table><tr><th>Tanggal</th><th>SKU</th><th>Keterangan</th><th class='text-right'>In</th><th class='text-right'>Out</th></tr>";
+        if(dataTrx.length === 0) html += "<tr><td colspan='5' align='center'>Belum ada transaksi</td></tr>";
+        
+        let totIn = 0, totOut = 0;
+        dataTrx.forEach(x => {
+            let tglFormat = x.tgl.split('-')[2] + '/' + x.tgl.split('-')[1] + '/' + x.tgl.split('-')[0].substring(2,4);
+            let inQty = x.jen === 'in' ? x.qty : '-';
+            let outQty = x.jen === 'out' ? x.qty : '-';
+            html += `<tr><td>${tglFormat}</td><td>${x.sku}</td><td>${x.ket}</td><td class='text-right' style='color:var(--success)'>${inQty}</td><td class='text-right' style='color:var(--danger)'>${outQty}</td></tr>`;
+            if(x.jen === 'in') totIn += x.qty; else totOut += x.qty;
+        });
+        
+        html += `<tr style="background:#f3f4f6; font-weight:bold;"><td colspan="3" class="text-right">TOTAL MUTASI</td><td class="text-right" style="color:var(--success)">${totIn}</td><td class="text-right" style="color:var(--danger)">${totOut}</td></tr>`;
+        html += `<tr style="background:#e5e7eb; font-weight:bold;"><td colspan="3" class="text-right">SISA STOK AKHIR</td><td colspan="2" class="text-right">${totIn - totOut} Unit</td></tr></table>`;
+        
+        document.getElementById('view-lap').innerHTML = html;
+    }
+
+    // DASHBOARD & REFRESH SEMUA DROPDOWN
+    function refreshSemua() {
+        updateKop();
+        tampilMaster();
+        
+        // Update Dropdown SKU
+        let optTrx = "<option value='' disabled selected>-- Pilih Barang --</option>";
+        let optLap = "<option value='Semua'>Semua Barang (Rekap Total)</option>";
+        
+        let totalItem = db_barang.length;
+        let totalStokAll = 0;
+        let kritisHtml = "<table><tr><th>SKU</th><th>Nama</th><th class='text-right'>Sisa</th></tr>";
+        let jmlKritis = 0;
+
+        db_barang.forEach(b => {
+            let namaPendek = b.nama.length > 20 ? b.nama.substring(0,20)+"..." : b.nama;
+            let stok = getStokAkhir(b.sku);
+            totalStokAll += stok;
+            
+            optTrx += `<option value="${b.sku}">[${b.sku}] ${namaPendek} (Sisa: ${stok})</option>`;
+            optLap += `<option value="${b.sku}">[${b.sku}] ${b.nama}</option>`;
+            
+            if(stok <= 5) {
+                jmlKritis++;
+                kritisHtml += `<tr><td>${b.sku}</td><td>${b.nama}</td><td class='text-right'><span class='badge-warn'>${stok}</span></td></tr>`;
+            }
+        });
+        
+        if(jmlKritis === 0) kritisHtml += "<tr><td colspan='3' align='center'>Stok aman, tidak ada yang menipis.</td></tr>";
+        kritisHtml += "</table>";
+
+        document.getElementById('t-sku').innerHTML = optTrx;
+        document.getElementById('l-sku').innerHTML = optLap;
+        document.getElementById('v-total-item').innerText = totalItem;
+        document.getElementById('v-total-stok').innerText = totalStokAll;
+        document.getElementById('v-total-kritis').innerText = jmlKritis;
+        document.getElementById('view-kritis').innerHTML = kritisHtml;
+        
+        tampilLaporan();
+    }
+
+    function exportExcel() {
+        let filterSku = document.getElementById('l-sku').value;
+        let dataTrx = filterSku === 'Semua' ? db_trx : db_trx.filter(x => x.sku === filterSku);
+        if(dataTrx.length === 0) return alert("Tidak ada data untuk di-export!");
+        
+        let csv = "Tanggal,SKU,Keterangan,Masuk,Keluar\n";
+        dataTrx.forEach(x => {
+            let masuk = x.jen === 'in' ? x.qty : 0;
+            let keluar = x.jen === 'out' ? x.qty : 0;
+            csv += `${x.tgl},${x.sku},"${x.ket}",${masuk},${keluar}\n`;
+        });
+        
+        let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        let url = URL.createObjectURL(blob);
+        let a = document.createElement("a"); a.href = url;
+        a.download = `KartuStok_${filterSku}.csv`;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    }
+
+    function bukaTab(id) { 
+        document.querySelectorAll('.page, .nav-item').forEach(e => e.classList.remove('active')); 
+        document.getElementById('p-'+id).classList.add('active'); 
+        event.currentTarget.classList.add('active'); 
+    }
+    
+    refreshSemua();
+</script>
+</body>
+</html>

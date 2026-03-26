@@ -1,0 +1,9 @@
+{
+  "name": "Stok Master Pro",
+  "short_name": "StokMaster",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f8f9fa",
+  "theme_color": "#0f766e",
+  "icons": [{"src": "https://cdn-icons-png.flaticon.com/512/2897/2897785.png", "sizes": "512x512", "type": "image/png"}]
+}
