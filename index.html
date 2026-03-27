@@ -57,7 +57,7 @@
             <div><label>Nama Barang</label><input type="text" id="b-nama" placeholder="Contoh: Oli Mesin"></div>
             <div><label>Kategori</label><input type="text" id="b-kat" placeholder="Contoh: Sparepart"></div>
             <div><label>Satuan</label><input type="text" id="b-sat" placeholder="Pcs / Dus / Kg" value="Pcs"></div>
-            <div><label>Batas Stok Minimum</label><input type="number" id="b-min" value="5"></div>
+            <div><label>Batas Stok Min</label><input type="number" id="b-min" value="5"></div>
             <div><label>Stok Awal</label><input type="number" id="b-stok" value="0"></div>
         </div>
         <button class="btn-main" onclick="simpanBarang()">💾 Simpan Barang</button>
@@ -77,8 +77,8 @@
             <div><label>Tanggal</label><input type="date" id="t-tgl"></div>
             <div><label>Jenis Transaksi</label>
                 <select id="t-jenis" style="font-weight:bold; color:var(--dark);">
-                    <option value="MASUK">📥 Barang MASUK (Tambah Stok)</option>
-                    <option value="KELUAR">📤 Barang KELUAR (Jual / Pakai)</option>
+                    <option value="MASUK">📥 Barang MASUK (Tambah)</option>
+                    <option value="KELUAR">📤 Barang KELUAR (Jual/Pakai)</option>
                 </select>
             </div>
         </div>
@@ -86,7 +86,7 @@
         <select id="t-barang"></select>
         <div class="grid-2">
             <div><label>Jumlah (Qty)</label><input type="number" id="t-qty" value="1" min="1"></div>
-            <div><label>Keterangan / Penerima</label><input type="text" id="t-ket" placeholder="Contoh: Restock / Terjual ke Budi"></div>
+            <div><label>Keterangan / Penerima</label><input type="text" id="t-ket" placeholder="Contoh: Terjual ke Budi"></div>
         </div>
         <button class="btn-main" onclick="simpanTransaksi()">⚡ Proses Transaksi</button>
     </div>
@@ -130,12 +130,16 @@
     let db_barang = JSON.parse(localStorage.getItem('gm_barang')) || []; 
     let db_trans = JSON.parse(localStorage.getItem('gm_trans')) || [];
     
-    // SET TANGGAL HARI INI
+    // SET TANGGAL HARI INI & KUNCI TANGGAL MASA DEPAN
     let now = new Date(); 
     let localIso = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString();
     let today = localIso.slice(0,10);
     document.getElementById('dash-tgl').innerText = now.toLocaleDateString('id-ID', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+    
+    // Set tanggal default ke hari ini
     setVal('t-tgl', today);
+    // KUNCI: Cegah user milih tanggal di atas hari ini
+    document.getElementById('t-tgl').setAttribute('max', today);
 
     // SETING GUDANG
     function simpanSet() { localStorage.setItem('gm_pt', getVal('set-pt')); refreshUI(); }
@@ -153,8 +157,7 @@
         let idx = db_barang.findIndex(x => x.kode === kode); 
         if(idx > -1) { 
             if(confirm("Kode sudah ada! Yakin update barang ini?")) {
-                // Jangan timpa stok jika sedang edit, stok diubah lewat In/Out
-                obj.stok = db_barang[idx].stok;
+                obj.stok = db_barang[idx].stok; // Jangan ubah stok lewat edit
                 db_barang[idx] = obj; 
             } else return; 
         } else { 
@@ -242,7 +245,7 @@
         db_barang.forEach(x => optBarang += `<option value="${x.kode}">${x.kode} - ${x.nama} (Stok: ${x.stok})</option>`); 
         document.getElementById('t-barang').innerHTML = optBarang;
 
-        // Update Tabel Master Barang (Dengan Fitur Cari)
+        // Update Tabel Master Barang
         let cari = getVal('cari-barang').toLowerCase();
         let h_barang = "<table><tr><th>Detail Barang</th><th>Stok</th><th>Aksi</th></tr>"; 
         db_barang.filter(x => x.nama.toLowerCase().includes(cari) || x.kode.toLowerCase().includes(cari)).forEach(x => { 
