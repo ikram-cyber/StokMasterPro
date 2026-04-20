@@ -3,314 +3,383 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gudang Master Pro</title>
-    
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#059669">
-    
+    <title>StokMasterPro | Enterprise WMS</title>
+    <meta name="theme-color" content="#064e3b">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --primary: #059669; --dark: #064e3b; --success: #10b981; --danger: #ef4444; --warn: #f59e0b; --bg: #f3f4f6; --text: #1f2937; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; padding-bottom: 80px; font-size: 13px; -webkit-tap-highlight-color: transparent; }
-        .card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 12px; border: 1px solid #e5e7eb; }
-        h3 { margin-top: 0; color: var(--dark); border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; font-size: 15px; }
-        input, select, button, textarea { width: 100%; padding: 10px; margin: 4px 0 10px 0; border-radius: 4px; border: 1px solid #d1d5db; box-sizing: border-box; font-size: 13px; font-family:inherit; }
-        input:focus, select:focus { border-color: var(--primary); outline: none; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn-main { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; padding: 12px; border-radius: 6px; }
-        .btn-danger { background: var(--danger); color: white; border: none; cursor: pointer; padding: 12px; border-radius: 6px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 11px; }
-        th, td { padding: 8px 6px; border-bottom: 1px solid #e5e7eb; text-align: left; vertical-align: middle; }
-        th { background: #f9fafb; font-weight: bold; color: #4b5563; }
-        .badge { padding: 3px 6px; border-radius: 4px; color: white; font-size: 10px; font-weight: bold; }
-        .bg-success { background: var(--success); } .bg-danger { background: var(--danger); } .bg-warn { background: var(--warn); }
-        .page { display: none; } .page.active { display: block; }
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 8px 2px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); border-top: 1px solid #e5e7eb; z-index:100; }
-        .nav-item { border: none; background: none; font-size: 10px; color: #6b7280; display: flex; flex-direction: column; align-items: center; cursor: pointer; width: 25%; padding: 4px; }
-        .nav-item.active { color: var(--primary); font-weight: bold; }
-        .nav-item i { font-size: 20px; margin-bottom: 3px; font-style: normal; }
-        label { font-weight: 600; font-size: 11px; color: #4b5563; }
+        :root { --primary: #059669; --dark: #064e3b; --success: #10b981; --danger: #e11d48; --warn: #f59e0b; --bg: #f8fafc; --text: #1f2937; --card: #ffffff; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: var(--bg); color: var(--text); margin: 0; padding: 15px; padding-bottom: 80px; font-size: 13px; -webkit-tap-highlight-color: transparent; }
+        
+        .card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 16px; border: 1px solid #e2e8f0; }
+        .hero-box { background: linear-gradient(135deg, var(--dark), var(--primary)); color: white; border: none; text-align: center; padding: 25px 15px; border-radius: 12px; box-shadow: 0 10px 20px rgba(6, 78, 59, 0.2); margin-bottom: 20px; }
+        
+        h3 { margin: 0 0 15px 0; color: var(--dark); border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; font-size: 14px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; display:flex; justify-content:space-between; align-items:center; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+        .metric-card { background: white; padding: 15px; border-radius: 10px; border: 1px solid #e2e8f0; text-align: center; transition: 0.3s; }
+        .m-title { font-size: 10px; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .m-val { font-size: 20px; font-weight: 900; margin-top: 8px; color: var(--dark); }
+        
+        input, select, button, textarea { width: 100%; padding: 12px; margin: 6px 0 14px 0; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; outline: none; transition: 0.3s; font-family:inherit; }
+        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1); }
+        label { font-size: 11px; font-weight: 700; color: #475569; margin-bottom: -4px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .btn-main { background: var(--primary); color: white; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-main:hover { background: var(--dark); }
+        .btn-danger { background: var(--danger); color: white; border: none; cursor: pointer; font-weight: bold; }
+        .btn-warn { background: var(--warn); color: white; border: none; cursor: pointer; font-weight: bold; color: #000; }
+        .btn-sm { padding: 6px 10px; font-size: 10px; margin: 0 2px 0 0; border-radius: 6px; font-weight:bold; cursor:pointer; border:none;}
+        
+        table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 5px; }
+        th, td { padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: top; }
+        th { background: #f8fafc; font-weight: 800; color: #64748b; text-transform: uppercase; font-size: 10px; }
+        
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; color: white;}
+        .bg-success { background: var(--success); } .bg-danger { background: var(--danger); } .bg-warn { background: var(--warn); color:#000; } .bg-dark { background: var(--dark); }
+        
+        .page { display: none; animation: fadeIn 0.4s ease; } .active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #e2e8f0; z-index: 1000; box-shadow: 0 -10px 20px rgba(0,0,0,0.03); }
+        .nav-item { border: none; background: none; font-size: 10px; color: #94a3b8; display: flex; flex-direction: column; align-items: center; width: 25%; cursor: pointer; font-weight: 700; padding:0; transition: 0.3s; }
+        .nav-item.active { color: var(--primary); transform: translateY(-2px); }
+        .nav-icon { font-size: 22px; margin-bottom: 4px; }
+        
+        /* Barcode Scanner Focus Style */
+        .scanner-ready { border: 2px solid var(--accent) !important; background: #f0fdf4; }
     </style>
 </head>
 <body>
 
-<div id="p-home" class="page active">
-    <div class="card" style="background:var(--primary); color:white;">
-        <h2 style="margin:0; font-size:18px;" id="dash-pt">GUDANG UTAMA</h2>
-        <p style="margin:5px 0 0 0; font-size:12px;">Update Stok: <span id="dash-tgl"></span></p>
-    </div>
-    <div class="grid-2">
-        <div class="card" style="text-align:center;"><h3>Total Barang</h3><h1 style="margin:0; color:var(--dark);" id="v-tot-barang">0</h1></div>
-        <div class="card" style="text-align:center;"><h3>Stok Menipis</h3><h1 style="margin:0; color:var(--danger);" id="v-tot-tipis">0</h1></div>
-    </div>
-    <div class="card">
-        <h3>Peringatan Stok Kurang! ⚠️</h3>
-        <div id="view-alert" style="overflow-x:auto;"></div>
-    </div>
-</div>
-
-<div id="p-barang" class="page">
-    <div class="card">
-        <h3>Tambah / Edit Barang Baru</h3>
-        <div class="grid-2">
-            <div><label>Kode Barang (SKU)</label><input type="text" id="b-kode" placeholder="Contoh: BRG-01"></div>
-            <div><label>Nama Barang</label><input type="text" id="b-nama" placeholder="Contoh: Oli Mesin"></div>
-            <div><label>Kategori</label><input type="text" id="b-kat" placeholder="Contoh: Sparepart"></div>
-            <div><label>Satuan</label><input type="text" id="b-sat" placeholder="Pcs / Dus / Kg" value="Pcs"></div>
-            <div><label>Batas Stok Min</label><input type="number" id="b-min" value="5"></div>
-            <div><label>Stok Awal</label><input type="number" id="b-stok" value="0"></div>
+    <div id="p-home" class="page active">
+        <div class="hero-box">
+            <h2 id="dash-pt" style="margin:0; font-size: 24px; font-weight:900; letter-spacing:1px;">GUDANG UTAMA</h2>
+            <p style="margin:5px 0 0 0; font-size:12px; font-weight:600; opacity:0.9;">Sync: <span id="dash-tgl"></span></p>
         </div>
-        <button class="btn-main" onclick="simpanBarang()">💾 Simpan Barang</button>
-        <button class="btn-danger" style="margin-top:5px; display:none;" id="btn-batal-b" onclick="batalEditBarang()">❌ Batal Edit</button>
-    </div>
-    <div class="card">
-        <h3>Daftar Semua Barang</h3>
-        <input type="text" id="cari-barang" placeholder="🔍 Cari nama atau kode barang..." onkeyup="refreshUI()" style="margin-bottom:10px;">
-        <div id="view-barang" style="overflow-x:auto;"></div>
-    </div>
-</div>
+        
+        <h3 style="margin-bottom:10px;">📊 Executive Inventory Analytics</h3>
+        <div class="grid-3">
+            <div class="metric-card"><div class="m-title">Total SKU</div><div class="m-val" id="v-tot-barang">0</div></div>
+            <div class="metric-card"><div class="m-title">Stok Kritis</div><div class="m-val" id="v-tot-tipis" style="color:var(--danger);">0</div></div>
+            <div class="metric-card"><div class="m-title">Transaksi /Bln</div><div class="m-val" id="v-tot-trans" style="color:var(--primary);">0</div></div>
+        </div>
 
-<div id="p-trans" class="page">
-    <div class="card">
-        <h3>Catat Keluar / Masuk Barang</h3>
-        <div class="grid-2">
-            <div><label>Tanggal</label><input type="date" id="t-tgl"></div>
-            <div><label>Jenis Transaksi</label>
-                <select id="t-jenis" style="font-weight:bold; color:var(--dark);">
-                    <option value="MASUK">📥 Barang MASUK (Tambah)</option>
-                    <option value="KELUAR">📤 Barang KELUAR (Jual/Pakai)</option>
-                </select>
+        <div class="card" style="background:#f0fdf4; border:1px solid #a7f3d0;">
+            <div style="font-size:11px; color:#047857; font-weight:bold; text-transform:uppercase;">Valuasi Total Aset (Est. Harga Beli)</div>
+            <div style="font-size:26px; font-weight:900; color:var(--dark); margin-top:5px;" id="v-valuasi">Rp 0</div>
+        </div>
+
+        <div class="card">
+            <h3 style="font-size:12px;">📈 Pergerakan Barang (Bulan Ini)</h3>
+            <canvas id="stokChart" height="180"></canvas>
+        </div>
+
+        <div class="card" style="border-top:3px solid var(--danger);">
+            <h3>⚠️ Notifikasi Stok Kritis</h3>
+            <div id="view-alert" style="overflow-x:auto;"></div>
+        </div>
+    </div>
+
+    <div id="p-barang" class="page">
+        <div class="card">
+            <h3>📦 Registrasi SKU Barang Baru</h3>
+            <div class="grid-2">
+                <div style="grid-column: span 2; display:flex; gap:10px; align-items:flex-end;">
+                    <div style="flex:1;">
+                        <label>Kode Barang (SKU / Barcode)</label>
+                        <input type="text" id="b-kode" placeholder="Scan Barcode / Ketik Manual" autofocus>
+                    </div>
+                    <button class="btn-warn" style="width:auto; padding:12px; margin-bottom:14px;" onclick="generateSKU()">⚡ AUTO</button>
+                </div>
+                <div style="grid-column: span 2;"><label>Nama Barang</label><input type="text" id="b-nama" placeholder="Contoh: Oli Mesin 1L"></div>
+                <div><label>Kategori</label><input type="text" id="b-kat" placeholder="Contoh: Sparepart"></div>
+                <div><label>Satuan</label><input type="text" id="b-sat" value="Pcs"></div>
+                <div><label>Harga Beli (Satuan)</label><input type="number" id="b-harga" value="0" placeholder="Rp"></div>
+                <div><label>Batas Stok Kritis</label><input type="number" id="b-min" value="5"></div>
+                <div style="grid-column: span 2;"><label>Stok Awal Fisik</label><input type="number" id="b-stok" value="0" style="font-weight:bold; font-size:16px;"></div>
             </div>
+            <button class="btn-main" onclick="simpanBarang()">💾 SIMPAN MASTER BARANG</button>
+            <button class="btn-danger" style="margin-top:10px; display:none;" id="btn-batal-b" onclick="batalEditBarang()">❌ BATAL EDIT</button>
         </div>
-        <label>Pilih Barang</label>
-        <select id="t-barang"></select>
-        <div class="grid-2">
-            <div><label>Jumlah (Qty)</label><input type="number" id="t-qty" value="1" min="1"></div>
-            <div><label>Keterangan / Penerima</label><input type="text" id="t-ket" placeholder="Contoh: Terjual ke Budi"></div>
+        
+        <div class="card">
+            <h3>📑 Database Master Barang</h3>
+            <input type="text" id="cari-barang" placeholder="🔍 Ketik atau Scan Barcode di sini..." onkeyup="refreshUI()" class="scanner-ready">
+            <div id="view-barang" style="overflow-x:auto;"></div>
         </div>
-        <button class="btn-main" onclick="simpanTransaksi()">⚡ Proses Transaksi</button>
     </div>
-    <div class="card">
-        <h3>Riwayat Transaksi Terakhir</h3>
-        <div id="view-trans" style="overflow-x:auto;"></div>
+
+    <div id="p-trans" class="page">
+        <div class="card" style="border-top:3px solid var(--primary);">
+            <h3>🔄 Logistik: Keluar / Masuk</h3>
+            <div class="grid-2">
+                <div><label>Tanggal Transaksi</label><input type="date" id="t-tgl"></div>
+                <div>
+                    <label>Jenis Logistik</label>
+                    <select id="t-jenis" style="font-weight:bold; font-size:14px; background:#f8fafc;">
+                        <option value="MASUK">📥 MASUK (Restock)</option>
+                        <option value="KELUAR">📤 KELUAR (Sales/Used)</option>
+                    </select>
+                </div>
+            </div>
+            <label>Pilih Barang / Scan Barcode</label>
+            <select id="t-barang" class="scanner-ready"></select>
+            <div class="grid-2">
+                <div><label>Quantity (Jumlah)</label><input type="number" id="t-qty" value="1" min="1" style="font-weight:bold; font-size:18px;"></div>
+                <div><label>Referensi / Keterangan</label><input type="text" id="t-ket" placeholder="No. DO / Faktur / Penerima"></div>
+            </div>
+            <button class="btn-main" onclick="simpanTransaksi()" style="font-size:16px; padding:15px; box-shadow: 0 4px 10px rgba(5,150,105,0.2);">⚡ PROSES TRANSAKSI</button>
+        </div>
+        <div class="card">
+            <h3>📜 Riwayat Pergerakan Terakhir</h3>
+            <div id="view-trans" style="overflow-x:auto;"></div>
+        </div>
     </div>
-</div>
 
-<div id="p-seting" class="page">
-    <div class="card">
-        <h3>Pengaturan Gudang</h3>
-        <label>Nama Toko / Gudang:</label>
-        <input type="text" id="set-pt" oninput="simpanSet()" placeholder="Contoh: Gudang Makmur Jaya">
-        
-        <hr style="margin:20px 0; border:1px solid #e5e7eb;">
-        
-        <h3>Export Data (Excel/CSV)</h3>
-        <button class="btn-main" style="margin-bottom:10px; background:var(--dark);" onclick="exportData('barang')">📊 Download Daftar Barang & Stok</button>
-        <button class="btn-main" style="background:var(--success);" onclick="exportData('trans')">📊 Download Riwayat Keluar-Masuk</button>
-        
-        <hr style="margin:20px 0; border:1px solid #e5e7eb;">
-        <button class="btn-danger" onclick="resetData()">⚠️ RESET SEMUA DATA GUDANG</button>
+    <div id="p-seting" class="page">
+        <div class="card">
+            <h3>⚙️ Konfigurasi Sistem Gudang</h3>
+            <label>Nama Entitas / Gudang</label>
+            <input type="text" id="set-pt" oninput="simpanSet()" placeholder="Contoh: PT. Logistik Makmur">
+        </div>
+        <div class="card" style="border-top:3px solid var(--success);">
+            <h3 style="color:var(--success)">📊 Data Extraction (Excel)</h3>
+            <p style="font-size:11px; color:#64748b;">Export data master dan mutasi stok ke format CSV untuk laporan akuntansi.</p>
+            <button class="btn-main" style="margin-bottom:10px; background:var(--dark);" onclick="exportData('barang')">⬇️ EXPORT MASTER BARANG</button>
+            <button class="btn-success" style="width:100%; padding:12px; border-radius:8px; font-weight:bold; border:none; cursor:pointer;" onclick="exportData('trans')">⬇️ EXPORT LOG TRANSAKSI</button>
+        </div>
+        <div class="card" style="border-top:3px solid var(--danger);">
+            <h3 style="color:var(--danger)">⚠️ Zona Berbahaya</h3>
+            <button class="btn-danger" style="width:100%;" onclick="resetData()">🗑️ FACTORY RESET (HAPUS SEMUA DATA)</button>
+        </div>
     </div>
-</div>
 
-<div class="bottom-nav">
-    <button class="nav-item active" onclick="bukaTab('home')"><i>📊</i>Dash</button>
-    <button class="nav-item" onclick="bukaTab('barang')"><i>📦</i>Barang</button>
-    <button class="nav-item" onclick="bukaTab('trans')"><i>🔄</i>In/Out</button>
-    <button class="nav-item" onclick="bukaTab('seting')"><i>⚙️</i>Seting</button>
-</div>
+    <div style="text-align: center; padding: 20px; color: #94a3b8; font-size: 11px; font-weight: bold; letter-spacing: 1px; margin-bottom: 10px;">&copy; 2026 Ikram Cyber System</div>
 
-<script>
-    // FUNGSI DASAR
-    const getVal = (id) => document.getElementById(id).value;
-    const getNum = (id) => parseInt(document.getElementById(id).value) || 0;
-    const setVal = (id, val) => document.getElementById(id).value = val;
-    
-    // DATABASE LOCAL
-    let db_barang = JSON.parse(localStorage.getItem('gm_barang')) || []; 
-    let db_trans = JSON.parse(localStorage.getItem('gm_trans')) || [];
-    
-    // SET TANGGAL HARI INI & KUNCI TANGGAL MASA DEPAN
-    let now = new Date(); 
-    let localIso = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString();
-    let today = localIso.slice(0,10);
-    document.getElementById('dash-tgl').innerText = now.toLocaleDateString('id-ID', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
-    
-    // Set tanggal default ke hari ini
-    setVal('t-tgl', today);
-    // KUNCI: Cegah user milih tanggal di atas hari ini
-    document.getElementById('t-tgl').setAttribute('max', today);
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="bukaTab('home')"><div class="nav-icon">📊</div>DASH</div>
+        <div class="nav-item" onclick="bukaTab('barang')"><div class="nav-icon">📦</div>SKU</div>
+        <div class="nav-item" onclick="bukaTab('trans')"><div class="nav-icon">🔄</div>LOGISTIK</div>
+        <div class="nav-item" onclick="bukaTab('seting')"><div class="nav-icon">⚙️</div>SETING</div>
+    </nav>
 
-    // SETING GUDANG
-    function simpanSet() { localStorage.setItem('gm_pt', getVal('set-pt')); refreshUI(); }
+    <script>
+        // INIT DB
+        let db_barang = JSON.parse(localStorage.getItem('gm_barang')) || [];
+        let db_trans = JSON.parse(localStorage.getItem('gm_trans')) || [];
+        let chartInstance = null;
 
-    // FUNGSI MASTER BARANG
-    function simpanBarang() { 
-        let kode = getVal('b-kode').toUpperCase(); let nama = getVal('b-nama'); 
-        if(!kode || !nama) return alert("Kode dan Nama Barang wajib diisi!"); 
-        
-        let obj = { 
-            kode: kode, nama: nama, kat: getVal('b-kat'), sat: getVal('b-sat'), 
-            min: getNum('b-min'), stok: getNum('b-stok') 
-        }; 
-        
-        let idx = db_barang.findIndex(x => x.kode === kode); 
-        if(idx > -1) { 
-            if(confirm("Kode sudah ada! Yakin update barang ini?")) {
-                obj.stok = db_barang[idx].stok; // Jangan ubah stok lewat edit
-                db_barang[idx] = obj; 
-            } else return; 
-        } else { 
-            db_barang.push(obj); 
-        } 
-        
-        localStorage.setItem('gm_barang', JSON.stringify(db_barang)); 
-        alert("Data Barang Tersimpan!"); batalEditBarang(); refreshUI(); 
-    }
-    
-    function editBarang(kode) { 
-        let b = db_barang.find(x => x.kode === kode); if(!b) return; 
-        setVal('b-kode', b.kode); document.getElementById('b-kode').readOnly = true; document.getElementById('b-kode').style.background = "#e5e7eb"; 
-        setVal('b-nama', b.nama); setVal('b-kat', b.kat); setVal('b-sat', b.sat); setVal('b-min', b.min); 
-        setVal('b-stok', b.stok); document.getElementById('b-stok').readOnly = true; document.getElementById('b-stok').style.background = "#e5e7eb";
-        document.getElementById('btn-batal-b').style.display = "block"; window.scrollTo(0, 0); 
-    }
-    
-    function batalEditBarang() { 
-        document.getElementById('b-kode').readOnly = false; document.getElementById('b-kode').style.background = "#fff"; 
-        document.getElementById('b-stok').readOnly = false; document.getElementById('b-stok').style.background = "#fff";
-        ['b-kode','b-nama','b-kat','b-sat'].forEach(id => setVal(id, '')); 
-        setVal('b-min', 5); setVal('b-stok', 0); 
-        document.getElementById('btn-batal-b').style.display = "none"; 
-    }
-    
-    function hapusBarang(kode) { 
-        if(confirm("⚠️ YAKIN HAPUS BARANG INI?\nRiwayat transaksi barang ini akan kehilangan nama!")) { 
-            db_barang = db_barang.filter(x => x.kode !== kode); 
-            localStorage.setItem('gm_barang', JSON.stringify(db_barang)); refreshUI(); 
-        } 
-    }
+        const getVal = (id) => document.getElementById(id).value;
+        const getNum = (id) => parseInt(document.getElementById(id).value) || 0;
+        const setVal = (id, val) => document.getElementById(id).value = val;
 
-    // FUNGSI TRANSAKSI IN/OUT
-    function simpanTransaksi() {
-        let tgl = getVal('t-tgl'); let jenis = getVal('t-jenis'); let kode = getVal('t-barang'); 
-        let qty = getNum('t-qty'); let ket = getVal('t-ket');
-        
-        if(!kode) return alert("Pilih barang dulu Bos!");
-        if(qty <= 0) return alert("Jumlah harus lebih dari 0!");
+        let now = new Date();
+        let localIso = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString();
+        let today = localIso.slice(0,10);
+        document.getElementById('dash-tgl').innerText = now.toLocaleDateString('id-ID', {weekday:'long', year:'numeric', month:'short', day:'numeric'});
+        setVal('t-tgl', today);
+        document.getElementById('t-tgl').setAttribute('max', today);
 
-        let idxBarang = db_barang.findIndex(x => x.kode === kode);
-        if(idxBarang === -1) return alert("Barang tidak ditemukan di database!");
+        function formatRp(angka) { return "Rp " + angka.toLocaleString('id-ID'); }
 
-        // Cek stok kalau keluar
-        if(jenis === 'KELUAR' && db_barang[idxBarang].stok < qty) {
-            if(!confirm(`⚠️ STOK MINUS!\nStok saat ini cuma ${db_barang[idxBarang].stok}. Yakin mau dikeluarin ${qty}?`)) return;
+        function simpanSet() { localStorage.setItem('gm_pt', getVal('set-pt')); refreshUI(); }
+
+        // AUTO SKU GENERATOR
+        function generateSKU() {
+            let kat = getVal('b-kat').trim() || "BRG";
+            let prefix = kat.substring(0,3).toUpperCase();
+            let rand = Math.floor(1000 + Math.random() * 9000);
+            setVal('b-kode', `${prefix}-${rand}`);
         }
 
-        // Simpan riwayat
-        let objTrans = { id: Date.now(), tgl: tgl, jenis: jenis, kode: kode, qty: qty, ket: ket };
-        db_trans.push(objTrans);
-        localStorage.setItem('gm_trans', JSON.stringify(db_trans));
+        // MASTER BARANG
+        function simpanBarang() {
+            let kode = getVal('b-kode').toUpperCase(); let nama = getVal('b-nama');
+            if(!kode || !nama) return alert("System Error: Kode SKU / Barcode & Nama wajib diisi!");
+            
+            let obj = {
+                kode: kode, nama: nama, kat: getVal('b-kat') || "Uncategorized", sat: getVal('b-sat') || "Pcs",
+                harga: getNum('b-harga'), min: getNum('b-min'), stok: getNum('b-stok')
+            };
 
-        // Update Stok di Master Barang
-        if(jenis === 'MASUK') db_barang[idxBarang].stok += qty;
-        else db_barang[idxBarang].stok -= qty;
-        
-        localStorage.setItem('gm_barang', JSON.stringify(db_barang));
-        
-        alert(`Berhasil catat barang ${jenis}!`);
-        setVal('t-qty', 1); setVal('t-ket', ''); refreshUI();
-    }
-
-    // FUNGSI REFRESH TAMPILAN
-    function refreshUI() { 
-        let pt = localStorage.getItem('gm_pt') || 'GUDANG UTAMA'; 
-        document.getElementById('dash-pt').innerText = pt.toUpperCase(); 
-        setVal('set-pt', pt === 'GUDANG UTAMA' ? '' : pt); 
-        
-        // Update Dashboard
-        document.getElementById('v-tot-barang').innerText = db_barang.length;
-        let stokTipis = db_barang.filter(x => x.stok <= x.min);
-        document.getElementById('v-tot-tipis').innerText = stokTipis.length;
-
-        let h_alert = "<table><tr><th>Kode/Nama</th><th>Stok</th><th>Min</th></tr>";
-        if(stokTipis.length === 0) h_alert += "<tr><td colspan='3' style='text-align:center;'>✅ Semua stok aman Bos!</td></tr>";
-        stokTipis.forEach(x => {
-            h_alert += `<tr><td><b>${x.kode}</b><br>${x.nama}</td><td><span class='badge bg-danger'>${x.stok} ${x.sat}</span></td><td>${x.min}</td></tr>`;
-        });
-        document.getElementById('view-alert').innerHTML = h_alert + "</table>";
-
-        // Update Dropdown Barang
-        let optBarang = "<option value=''>-- Pilih Barang --</option>"; 
-        db_barang.forEach(x => optBarang += `<option value="${x.kode}">${x.kode} - ${x.nama} (Stok: ${x.stok})</option>`); 
-        document.getElementById('t-barang').innerHTML = optBarang;
-
-        // Update Tabel Master Barang
-        let cari = getVal('cari-barang').toLowerCase();
-        let h_barang = "<table><tr><th>Detail Barang</th><th>Stok</th><th>Aksi</th></tr>"; 
-        db_barang.filter(x => x.nama.toLowerCase().includes(cari) || x.kode.toLowerCase().includes(cari)).forEach(x => { 
-            let wrnStok = x.stok <= x.min ? 'bg-danger' : 'bg-success';
-            h_barang += `<tr>
-                <td><b>${x.kode}</b><br>${x.nama}<br><span style="color:#6b7280; font-size:9px;">${x.kat}</span></td>
-                <td><span class='badge ${wrnStok}'>${x.stok} ${x.sat}</span></td>
-                <td>
-                    <button class='btn-main' style='padding:4px 8px; font-size:12px; margin-bottom:4px;' onclick='editBarang("${x.kode}")'>✏️</button>
-                    <button class='btn-danger' style='padding:4px 8px; font-size:12px;' onclick='hapusBarang("${x.kode}")'>🗑️</button>
-                </td>
-            </tr>`; 
-        }); 
-        document.getElementById('view-barang').innerHTML = h_barang + "</table>"; 
-
-        // Update Tabel Transaksi
-        let h_trans = "<table><tr><th>Tgl/Ket</th><th>Barang</th><th>In/Out</th></tr>"; 
-        db_trans.sort((a,b)=>b.id-a.id).slice(0, 50).forEach(x => { 
-            let b = db_barang.find(y => y.kode === x.kode); 
-            let namaBrg = b ? b.nama : 'Dihapus';
-            let badgeTr = x.jenis === 'MASUK' ? "<span class='badge bg-success'>+ IN</span>" : "<span class='badge bg-danger'>- OUT</span>";
-            let wrnAngka = x.jenis === 'MASUK' ? 'color:var(--success)' : 'color:var(--danger)';
-            h_trans += `<tr>
-                <td>${x.tgl.slice(5,10)}<br><span style="font-size:9px;">${x.ket}</span></td>
-                <td><b>${x.kode}</b><br>${namaBrg}</td>
-                <td style='text-align:center;'>${badgeTr}<br><b style='${wrnAngka}'>${x.qty}</b></td>
-            </tr>`; 
-        }); 
-        document.getElementById('view-trans').innerHTML = h_trans + "</table><p style='font-size:10px; text-align:center; color:#6b7280;'>Menampilkan 50 transaksi terakhir</p>"; 
-    }
-
-    // EXPORT & RESET
-    function exportData(jenis) { 
-        let csv = ""; let fn = ""; 
-        if(jenis === 'barang') { 
-            csv = "Kode,Nama Barang,Kategori,Satuan,Stok Minimum,Stok Saat Ini\n"; 
-            db_barang.forEach(x => { csv += `="${x.kode}","${x.nama}","${x.kat}","${x.sat}",${x.min},${x.stok}\n`; }); 
-            fn = "Laporan_Stok_Gudang.csv"; 
-        } else { 
-            csv = "Tanggal,Jenis,Kode Barang,Nama Barang,Qty,Keterangan\n"; 
-            db_trans.forEach(x => { 
-                let b = db_barang.find(y => y.kode === x.kode); 
-                let namaBrg = b ? b.nama : '-';
-                csv += `${x.tgl},"${x.jenis}",="${x.kode}","${namaBrg}",${x.qty},"${x.ket}"\n`; 
-            }); 
-            fn = "Riwayat_Keluar_Masuk_Barang.csv"; 
-        } 
-        let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); 
-        let a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = fn; a.click(); 
-    }
-
-    function resetData() {
-        if(confirm('⚠️ YAKIN HAPUS SEMUA DATA GUDANG & TRANSAKSI? Data tidak bisa dikembalikan!')) { 
-            localStorage.removeItem('gm_barang'); localStorage.removeItem('gm_trans'); location.reload(); 
+            let idx = db_barang.findIndex(x => x.kode === kode);
+            if(idx > -1) {
+                if(confirm("SKU Terdaftar! Update data master barang ini?")) {
+                    obj.stok = db_barang[idx].stok; // Stok tidak boleh diedit manual setelah inisiasi
+                    db_barang[idx] = obj;
+                } else return;
+            } else { db_barang.push(obj); }
+            
+            localStorage.setItem('gm_barang', JSON.stringify(db_barang));
+            alert("Database Barang Tersimpan!"); batalEditBarang(); refreshUI();
         }
-    }
 
-    function bukaTab(id) { 
-        document.querySelectorAll('.page, .nav-item').forEach(e => e.classList.remove('active')); 
-        document.getElementById('p-'+id).classList.add('active'); 
-        document.querySelectorAll('.bottom-nav .nav-item').forEach(n => { if(n.getAttribute('onclick').includes(id)) n.classList.add('active'); }); 
-    }
-    
-    // Jalankan saat pertama buka
-    refreshUI();
-</script>
+        function editBarang(kode) {
+            let b = db_barang.find(x => x.kode === kode); if(!b) return;
+            setVal('b-kode', b.kode); document.getElementById('b-kode').readOnly = true; document.getElementById('b-kode').style.background = "#e2e8f0";
+            setVal('b-nama', b.nama); setVal('b-kat', b.kat); setVal('b-sat', b.sat); setVal('b-harga', b.harga || 0); setVal('b-min', b.min);
+            setVal('b-stok', b.stok); document.getElementById('b-stok').readOnly = true; document.getElementById('b-stok').style.background = "#e2e8f0";
+            document.getElementById('btn-batal-b').style.display = "block"; window.scrollTo(0, 0);
+        }
+
+        function batalEditBarang() {
+            document.getElementById('b-kode').readOnly = false; document.getElementById('b-kode').style.background = "#fff";
+            document.getElementById('b-stok').readOnly = false; document.getElementById('b-stok').style.background = "#fff";
+            ['b-kode','b-nama','b-kat','b-sat','b-harga'].forEach(id => setVal(id, ''));
+            setVal('b-sat', 'Pcs'); setVal('b-min', 5); setVal('b-stok', 0); setVal('b-harga', 0);
+            document.getElementById('btn-batal-b').style.display = "none";
+        }
+
+        function hapusBarang(kode) {
+            if(confirm("CRITICAL WARNING: Menghapus data master akan membuat log transaksi barang ini kehilangan identitas. Lanjutkan?")) {
+                db_barang = db_barang.filter(x => x.kode !== kode);
+                localStorage.setItem('gm_barang', JSON.stringify(db_barang)); refreshUI();
+            }
+        }
+
+        // TRANSAKSI
+        function simpanTransaksi() {
+            let tgl = getVal('t-tgl'); let jenis = getVal('t-jenis'); let kode = getVal('t-barang');
+            let qty = getNum('t-qty'); let ket = getVal('t-ket') || "Logistik Standar";
+
+            if(!kode) return alert("System Error: SKU Barang belum dipilih/scan!");
+            if(qty <= 0) return alert("System Error: Qty minimal 1!");
+
+            let idx = db_barang.findIndex(x => x.kode === kode);
+            if(idx === -1) return alert("SKU tidak ditemukan di Master Database!");
+
+            if(jenis === 'KELUAR' && db_barang[idx].stok < qty) {
+                if(!confirm(`INSUFFICIENT STOCK: Sisa fisik hanya ${db_barang[idx].stok} ${db_barang[idx].sat}. Paksakan keluarkan ${qty}? (Akan menyebabkan stok minus)`)) return;
+            }
+
+            db_trans.push({ id: Date.now(), tgl: tgl, jenis: jenis, kode: kode, qty: qty, ket: ket });
+            localStorage.setItem('gm_trans', JSON.stringify(db_trans));
+
+            if(jenis === 'MASUK') db_barang[idx].stok += qty; else db_barang[idx].stok -= qty;
+            localStorage.setItem('gm_barang', JSON.stringify(db_barang));
+
+            alert(`Logistik ${jenis} berhasil diposting!`);
+            setVal('t-qty', 1); setVal('t-ket', ''); refreshUI();
+        }
+
+        // RENDER UI & CHART
+        function renderChart(inQty, outQty) {
+            const ctx = document.getElementById('stokChart').getContext('2d');
+            if(chartInstance) chartInstance.destroy();
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Barang Masuk (In)', 'Barang Keluar (Out)'],
+                    datasets: [{ data: [inQty, outQty], backgroundColor: ['#10b981', '#e11d48'], borderRadius: 6 }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+            });
+        }
+
+        function refreshUI() {
+            let pt = localStorage.getItem('gm_pt') || 'GUDANG UTAMA ENTERPRISE';
+            document.getElementById('dash-pt').innerText = pt.toUpperCase();
+            setVal('set-pt', pt.includes('GUDANG UTAMA') ? '' : pt);
+
+            // METRICS
+            document.getElementById('v-tot-barang').innerText = db_barang.length;
+            let stokTipis = db_barang.filter(x => x.stok <= x.min);
+            document.getElementById('v-tot-tipis').innerText = stokTipis.length;
+            
+            let blnIni = today.slice(0,7);
+            let transBulanIni = db_trans.filter(x => x.tgl.startsWith(blnIni));
+            document.getElementById('v-tot-trans').innerText = transBulanIni.length;
+
+            // VALUASI ASET
+            let totalValuasi = 0;
+            db_barang.forEach(x => { totalValuasi += (x.stok * (x.harga || 0)); });
+            document.getElementById('v-valuasi').innerText = formatRp(totalValuasi);
+
+            // ALERT STOK
+            let h_alert = "<table><tr><th>SKU / Nama</th><th>Stok Fisik</th><th>Sisa</th></tr>";
+            if(stokTipis.length === 0) h_alert += "<tr><td colspan='3' align='center' style='color:var(--success); font-weight:bold;'>✅ Inventory Level Aman</td></tr>";
+            stokTipis.forEach(x => { h_alert += `<tr><td><b>${x.kode}</b><br><span style="font-size:10px;">${x.nama}</span></td><td align="center"><span class='badge bg-danger'>${x.stok}</span></td><td align="center">${x.sat}</td></tr>`; });
+            document.getElementById('view-alert').innerHTML = h_alert + "</table>";
+
+            // DROPDOWN & BARCODE READY
+            let optBarang = "<option value=''>-- Pilih / Scan Barcode SKU --</option>";
+            db_barang.forEach(x => optBarang += `<option value="${x.kode}">${x.kode} - ${x.nama} [Tersedia: ${x.stok}]</option>`);
+            document.getElementById('t-barang').innerHTML = optBarang;
+
+            // MASTER TABLE
+            let cari = getVal('cari-barang').toLowerCase();
+            let h_barang = "<table><tr><th>Data SKU</th><th>Stok</th><th>Valuasi</th><th>Aksi</th></tr>";
+            db_barang.filter(x => x.nama.toLowerCase().includes(cari) || x.kode.toLowerCase().includes(cari) || x.kat.toLowerCase().includes(cari)).forEach(x => {
+                let wrn = x.stok <= x.min ? 'bg-danger' : 'bg-success';
+                let valAsset = x.stok * (x.harga || 0);
+                h_barang += `<tr>
+                    <td><b style="color:var(--dark);">${x.kode}</b><br><b>${x.nama}</b><br><span style="color:#64748b; font-size:9px;">${x.kat.toUpperCase()}</span></td>
+                    <td align="center"><span class='badge ${wrn}'>${x.stok}</span><br><span style="font-size:9px; font-weight:bold;">${x.sat}</span></td>
+                    <td><span style="font-size:10px; color:var(--dark); font-weight:bold;">${formatRp(valAsset)}</span></td>
+                    <td align="center">
+                        <button class='btn-sm btn-main' onclick='editBarang("${x.kode}")'>✏️</button>
+                        <button class='btn-sm btn-danger' style="margin-top:4px;" onclick='hapusBarang("${x.kode}")'>🗑️</button>
+                    </td>
+                </tr>`;
+            });
+            document.getElementById('view-barang').innerHTML = h_barang + "</table>";
+
+            // TRANS TABLE & CHART DATA
+            let h_trans = "<table><tr><th>Tanggal/Ref</th><th>SKU Barang</th><th>Pergerakan</th></tr>";
+            let inQty = 0, outQty = 0;
+            
+            db_trans.sort((a,b)=>b.id-a.id).slice(0, 50).forEach(x => {
+                if(x.tgl.startsWith(blnIni)) { if(x.jenis === 'MASUK') inQty += x.qty; else outQty += x.qty; }
+                let b = db_barang.find(y => y.kode === x.kode);
+                let badge = x.jenis === 'MASUK' ? "<span class='badge bg-success'>+ IN</span>" : "<span class='badge bg-danger'>- OUT</span>";
+                h_trans += `<tr>
+                    <td><b>${formatTgl(x.tgl)}</b><br><span style="font-size:9px; color:#64748b;">${x.ket}</span></td>
+                    <td><b style="color:var(--dark);">${x.kode}</b><br><span style="font-size:10px;">${b?b.nama:'[Dihapus]'}</span></td>
+                    <td align="center">${badge}<br><b style="font-size:14px;">${x.qty}</b></td>
+                </tr>`;
+            });
+            document.getElementById('view-trans').innerHTML = h_trans + "</table><p style='font-size:10px; text-align:center; color:#94a3b8;'>Menampilkan 50 logistik terakhir</p>";
+            
+            renderChart(inQty, outQty);
+        }
+
+        // EXPORT EXCEL
+        function exportData(jenis) {
+            let csv = ""; let fn = "";
+            if(jenis === 'barang') {
+                csv = "SKU KODE,NAMA BARANG,KATEGORI,SATUAN,HARGA BELI,STOK KRITIS,STOK FISIK,TOTAL VALUASI ASET\n";
+                db_barang.forEach(x => { 
+                    let val = x.stok * (x.harga || 0);
+                    csv += `="${x.kode}","${x.nama}","${x.kat}","${x.sat}",${x.harga||0},${x.min},${x.stok},${val}\n`; 
+                });
+                fn = "WMS_Master_Asset.csv";
+            } else {
+                csv = "TANGGAL,JENIS MUTASI,SKU KODE,NAMA BARANG,QUANTITY,KETERANGAN / REF\n";
+                db_trans.forEach(x => {
+                    let b = db_barang.find(y => y.kode === x.kode);
+                    csv += `${x.tgl},"${x.jenis}",="${x.kode}","${b?b.nama:'-'}",${x.qty},"${x.ket}"\n`;
+                });
+                fn = "WMS_Logistics_History.csv";
+            }
+            let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            let a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = fn; a.click();
+        }
+
+        function resetData() {
+            if(confirm('CRITICAL SYSTEM WARNING: Seluruh database SKU dan log mutasi logistik akan dihapus permanen. Lanjutkan Factory Reset?')) {
+                localStorage.removeItem('gm_barang'); localStorage.removeItem('gm_trans'); location.reload();
+            }
+        }
+
+        function bukaTab(id) {
+            document.querySelectorAll('.page, .nav-item').forEach(e => e.classList.remove('active'));
+            document.getElementById('p-'+id).classList.add('active');
+            document.querySelectorAll('.bottom-nav .nav-item').forEach(n => { if(n.getAttribute('onclick').includes(id)) n.classList.add('active'); });
+        }
+
+        refreshUI();
+    </script>
 </body>
 </html>
