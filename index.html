@@ -3,30 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>StokMasterPro | Enterprise WMS (FIFO/LIFO Ready)</title>
+    <title>StokMasterPro | Enterprise WMS & Supply Chain Analytics</title>
     <meta name="theme-color" content="#064e3b">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #059669; --dark: #064e3b; --success: #10b981; --danger: #e11d48; --warn: #f59e0b; --bg: #f8fafc; --text: #1f2937; --card: #ffffff; }
         * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
-        body { background: var(--bg); color: var(--text); margin: 0; padding: 15px; padding-bottom: 80px; font-size: 13px; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); margin: 0; padding: 15px; padding-bottom: 90px; font-size: 13px; -webkit-tap-highlight-color: transparent; }
         
         .card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 16px; border: 1px solid #e2e8f0; }
-        .hero-box { background: linear-gradient(135deg, var(--dark), var(--primary)); color: white; border: none; text-align: center; padding: 25px 15px; border-radius: 12px; box-shadow: 0 10px 20px rgba(6, 78, 59, 0.2); margin-bottom: 20px; }
+        .hero-box { background: linear-gradient(135deg, var(--dark), var(--primary)); color: white; border: none; text-align: center; padding: 25px 15px; border-radius: 12px; box-shadow: 0 10px 20px rgba(6, 78, 59, 0.2); margin-bottom: 20px; position: relative; overflow:hidden;}
         
         h3 { margin: 0 0 15px 0; color: var(--dark); border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; font-size: 14px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; display:flex; justify-content:space-between; align-items:center; }
         
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
         .metric-card { background: white; padding: 15px; border-radius: 10px; border: 1px solid #e2e8f0; text-align: center; transition: 0.3s; }
-        .m-title { font-size: 10px; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-        .m-val { font-size: 20px; font-weight: 900; margin-top: 8px; color: var(--dark); }
+        .m-title { font-size: 9px; color: #64748b; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
+        .m-val { font-size: 18px; font-weight: 900; margin-top: 8px; color: var(--dark); }
         
         input, select, button, textarea { width: 100%; padding: 12px; margin: 6px 0 14px 0; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; outline: none; transition: 0.3s; font-family:inherit; }
         input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1); }
-        label { font-size: 11px; font-weight: 700; color: #475569; margin-bottom: -4px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+        label { font-size: 11px; font-weight: 800; color: #475569; margin-bottom: -4px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
         
-        .btn-main { background: var(--primary); color: white; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-main { background: var(--primary); color: white; border: none; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
         .btn-main:hover { background: var(--dark); }
         .btn-danger { background: var(--danger); color: white; border: none; cursor: pointer; font-weight: bold; }
         .btn-warn { background: var(--warn); color: white; border: none; cursor: pointer; font-weight: bold; color: #000; }
@@ -34,93 +34,110 @@
         
         table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 5px; }
         th, td { padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: top; }
-        th { background: #f8fafc; font-weight: 800; color: #64748b; text-transform: uppercase; font-size: 10px; }
+        th { background: #f8fafc; font-weight: 900; color: #64748b; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px;}
         
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; color: white;}
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 900; text-transform: uppercase; color: white;}
         .bg-success { background: var(--success); } .bg-danger { background: var(--danger); } .bg-warn { background: var(--warn); color:#000; } .bg-dark { background: var(--dark); }
         
+        /* ABC Analysis Badges */
+        .abc-a { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+        .abc-b { background: #fef3c7; color: #b45309; border: 1px solid #fcd34d; }
+        .abc-c { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+
         .page { display: none; animation: fadeIn 0.4s ease; } .active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #e2e8f0; z-index: 1000; box-shadow: 0 -10px 20px rgba(0,0,0,0.03); }
-        .nav-item { border: none; background: none; font-size: 10px; color: #94a3b8; display: flex; flex-direction: column; align-items: center; width: 25%; cursor: pointer; font-weight: 700; padding:0; transition: 0.3s; }
+        .nav-item { border: none; background: none; font-size: 10px; color: #94a3b8; display: flex; flex-direction: column; align-items: center; width: 25%; cursor: pointer; font-weight: 800; padding:0; transition: 0.3s; }
         .nav-item.active { color: var(--primary); transform: translateY(-2px); }
         .nav-icon { font-size: 22px; margin-bottom: 4px; }
         
-        .scanner-ready { border: 2px solid var(--primary) !important; background: #f0fdf4; }
+        .scanner-ready { border: 2px solid var(--primary) !important; background: #f0fdf4; font-weight:bold;}
     </style>
 </head>
 <body>
 
     <div id="p-home" class="page active">
         <div class="hero-box">
-            <h2 id="dash-pt" style="margin:0; font-size: 24px; font-weight:900; letter-spacing:1px;">GUDANG UTAMA</h2>
-            <p style="margin:5px 0 0 0; font-size:12px; font-weight:600; opacity:0.9;">Sync: <span id="dash-tgl"></span></p>
+            <div style="position:absolute; right:-10%; top:-20%; font-size:120px; opacity:0.05;">📦</div>
+            <h2 id="dash-pt" style="margin:0; font-size: 26px; font-weight:900; letter-spacing:1px;">GUDANG UTAMA</h2>
+            <p style="margin:5px 0 0 0; font-size:11px; font-weight:700; opacity:0.9; text-transform:uppercase;">Data Scientist Mode | Sync: <span id="dash-tgl"></span></p>
         </div>
         
-        <h3 style="margin-bottom:10px;">📊 Executive Inventory Analytics</h3>
+        <h3 style="margin-bottom:10px;">🧪 Supply Chain Intelligence</h3>
         <div class="grid-3">
             <div class="metric-card"><div class="m-title">Total SKU</div><div class="m-val" id="v-tot-barang">0</div></div>
             <div class="metric-card"><div class="m-title">Stok Kritis</div><div class="m-val" id="v-tot-tipis" style="color:var(--danger);">0</div></div>
-            <div class="metric-card"><div class="m-title">Transaksi /Bln</div><div class="m-val" id="v-tot-trans" style="color:var(--primary);">0</div></div>
+            <div class="metric-card"><div class="m-title">Inventory Turnover</div><div class="m-val" id="v-itr" style="color:var(--success);">0x</div></div>
         </div>
 
-        <div class="card" style="background:#f0fdf4; border:1px solid #a7f3d0; position:relative; overflow:hidden;">
-            <div style="position:absolute; right:-20px; top:-20px; font-size:100px; opacity:0.05; color:var(--dark);">💰</div>
-            <div style="font-size:11px; color:#047857; font-weight:bold; text-transform:uppercase;">Total Valuasi Aset Gudang</div>
-            <div style="font-size:26px; font-weight:900; color:var(--dark); margin-top:5px;" id="v-valuasi">Rp 0</div>
-            <div style="font-size:10px; color:#64748b; font-weight:bold; margin-top:8px;">Metode Akuntansi: <span id="v-metode" style="background:var(--dark); color:white; padding:2px 6px; border-radius:4px;">FIFO</span></div>
+        <div class="grid-2" style="margin-bottom:15px;">
+            <div class="metric-card" style="background:#f0fdf4; border-color:#a7f3d0; text-align:left;">
+                <div class="m-title" style="color:#047857;">Total Valuasi Aset</div>
+                <div style="font-size:16px; font-weight:900; color:var(--dark); margin-top:5px;" id="v-valuasi">Rp 0</div>
+                <div style="font-size:9px; color:#64748b; font-weight:bold; margin-top:4px;">Metode: <span id="v-metode">FIFO</span></div>
+            </div>
+            <div class="metric-card" style="background:#fff1f2; border-color:#fecdd3; text-align:left;">
+                <div class="m-title" style="color:#be123c;">HPP / COGS (Bulan Ini)</div>
+                <div style="font-size:16px; font-weight:900; color:#be123c; margin-top:5px;" id="v-cogs">Rp 0</div>
+                <div style="font-size:9px; color:#64748b; font-weight:bold; margin-top:4px;">Cost of Goods Sold</div>
+            </div>
+        </div>
+
+        <div class="card" style="border-top:3px solid var(--primary);">
+            <h3>📊 Pareto 80/20 (ABC Analysis)</h3>
+            <p style="font-size:10px; color:#64748b; margin-top:-10px;">Algoritma klasifikasi aset berdasarkan kontribusi valuasi inventaris.</p>
+            <div id="view-abc" style="overflow-x:auto;"></div>
         </div>
 
         <div class="card">
-            <h3 style="font-size:12px;">📈 Pergerakan Barang (Bulan Ini)</h3>
-            <canvas id="stokChart" height="180"></canvas>
+            <h3 style="font-size:12px;">📈 Pergerakan Fisik (Bulan Ini)</h3>
+            <canvas id="stokChart" height="150"></canvas>
         </div>
 
         <div class="card" style="border-top:3px solid var(--danger);">
-            <h3>⚠️ Notifikasi Stok Kritis</h3>
+            <h3>⚠️ Notifikasi Defisit Stok</h3>
             <div id="view-alert" style="overflow-x:auto;"></div>
         </div>
     </div>
 
     <div id="p-barang" class="page">
         <div class="card">
-            <h3>📦 Registrasi SKU (Setup Awal)</h3>
-            <p style="font-size:11px; color:#64748b; margin-top:-10px;">Form ini hanya untuk registrasi barang pertama kali. Penambahan stok & harga baru dilakukan via menu LOGISTIK.</p>
+            <h3>📦 Registrasi Master SKU</h3>
             <div class="grid-2">
                 <div style="grid-column: span 2; display:flex; gap:10px; align-items:flex-end;">
                     <div style="flex:1;">
                         <label>Kode Barang (SKU / Barcode)</label>
-                        <input type="text" id="b-kode" placeholder="Scan Barcode / Ketik Manual" autofocus>
+                        <input type="text" id="b-kode" placeholder="Scan Barcode..." autofocus class="scanner-ready">
                     </div>
                     <button class="btn-warn" style="width:auto; padding:12px; margin-bottom:14px;" onclick="generateSKU()">⚡ AUTO</button>
                 </div>
                 <div style="grid-column: span 2;"><label>Nama Barang</label><input type="text" id="b-nama" placeholder="Contoh: Oli Mesin 1L"></div>
                 <div><label>Kategori</label><input type="text" id="b-kat" placeholder="Contoh: Sparepart"></div>
                 <div><label>Satuan</label><input type="text" id="b-sat" value="Pcs"></div>
-                <div><label>Batas Stok Kritis</label><input type="number" id="b-min" value="5"></div>
+                <div><label>Batas Stok (Reorder Point)</label><input type="number" id="b-min" value="5"></div>
                 <div><label>Stok Awal Fisik</label><input type="number" id="b-stok" value="0"></div>
                 <div style="grid-column: span 2;"><label>Harga Beli Awal (Per Satuan)</label><input type="number" id="b-harga" value="0" placeholder="Rp" style="font-weight:bold; font-size:16px; border-color:var(--dark);"></div>
             </div>
             <button class="btn-main" onclick="simpanBarang()">💾 SIMPAN MASTER SKU</button>
             <button class="btn-danger" style="margin-top:10px; display:none;" id="btn-batal-b" onclick="batalEditBarang()">❌ BATAL EDIT</button>
         </div>
-        
+
         <div class="card">
             <h3>📑 Database Master Barang</h3>
-            <input type="text" id="cari-barang" placeholder="🔍 Ketik atau Scan Barcode di sini..." onkeyup="refreshUI()" class="scanner-ready">
+            <input type="text" id="cari-barang" placeholder="🔍 Cari / Scan Barcode..." onkeyup="refreshUI()" class="scanner-ready">
             <div id="view-barang" style="overflow-x:auto;"></div>
         </div>
     </div>
 
     <div id="p-trans" class="page">
         <div class="card" style="border-top:3px solid var(--primary);">
-            <h3>🔄 Logistik: Mutasi Barang</h3>
+            <h3>🔄 Logistik Mutasi (Batch Tracking)</h3>
             <div class="grid-2">
                 <div><label>Tanggal Transaksi</label><input type="date" id="t-tgl"></div>
                 <div>
                     <label>Jenis Mutasi</label>
-                    <select id="t-jenis" style="font-weight:bold; font-size:14px; background:#f8fafc;" onchange="toggleHargaInput()">
+                    <select id="t-jenis" style="font-weight:900; font-size:14px; background:#f8fafc;" onchange="toggleHargaInput()">
                         <option value="MASUK">📥 MASUK (Restock)</option>
                         <option value="KELUAR">📤 KELUAR (Sales/Used)</option>
                     </select>
@@ -129,11 +146,11 @@
             <label>Pilih Barang / Scan Barcode</label>
             <select id="t-barang" class="scanner-ready"></select>
             <div class="grid-2">
-                <div><label>Quantity (Jumlah)</label><input type="number" id="t-qty" value="1" min="1" style="font-weight:bold; font-size:18px;"></div>
-                <div id="div-harga"><label>Harga Beli (Modal Baru)</label><input type="number" id="t-harga" value="0" placeholder="Rp"></div>
+                <div><label>Quantity (Jumlah)</label><input type="number" id="t-qty" value="1" min="1" style="font-weight:900; font-size:18px;"></div>
+                <div id="div-harga"><label>Harga Beli (Modal Batch Baru)</label><input type="number" id="t-harga" value="0" placeholder="Rp" style="font-weight:bold; color:var(--dark);"></div>
             </div>
-            <label>Referensi / Keterangan</label><input type="text" id="t-ket" placeholder="No. DO / Faktur / Penerima">
-            <button class="btn-main" onclick="simpanTransaksi()" style="font-size:16px; padding:15px; box-shadow: 0 4px 10px rgba(5,150,105,0.2);">⚡ PROSES TRANSAKSI</button>
+            <label>Referensi / Keterangan</label><input type="text" id="t-ket" placeholder="No. DO / Faktur / Konsumen">
+            <button class="btn-main" onclick="simpanTransaksi()" style="font-size:16px; padding:15px; box-shadow: 0 4px 15px rgba(5,150,105,0.3);">⚡ POSTING TRANSAKSI</button>
         </div>
         <div class="card">
             <h3>📜 Riwayat Mutasi Terakhir</h3>
@@ -143,43 +160,34 @@
 
     <div id="p-seting" class="page">
         <div class="card">
-            <h3>⚙️ Konfigurasi Sistem Gudang</h3>
+            <h3>⚙️ Parameter Operasional</h3>
             <label>Nama Entitas / Gudang</label>
             <input type="text" id="set-pt" oninput="simpanSet()" placeholder="Contoh: PT. Logistik Makmur">
             <hr style="margin:15px 0; border:1px solid #e2e8f0;">
-            <label style="color:var(--dark);">Metode Valuasi Akuntansi (Inventory Costing)</label>
-            <select id="set-metode" style="font-weight:bold; border-color:var(--dark);" onchange="simpanSet()">
-                <option value="FIFO">FIFO (First In First Out) - Standar Umum</option>
-                <option value="LIFO">LIFO (Last In First Out) - Khusus</option>
+            <label style="color:var(--dark);">Metode Valuasi & HPP (Inventory Costing)</label>
+            <select id="set-metode" style="font-weight:900; border-color:var(--dark);" onchange="simpanSet()">
+                <option value="FIFO">FIFO (First In First Out) - PSAK Standard</option>
+                <option value="LIFO">LIFO (Last In First Out)</option>
             </select>
-            <p style="font-size:10px; color:#64748b; margin-top:-5px;">*Perubahan metode akan otomatis mengkalkulasi ulang total valuasi aset secara realtime berdasarkan histori batch barang masuk.</p>
-        </div>
-        <div class="card" style="border-top:3px solid var(--success);">
-            <h3 style="color:var(--success)">📊 Data Extraction (Excel)</h3>
-            <button class="btn-main" style="margin-bottom:10px; background:var(--dark);" onclick="exportData('barang')">⬇️ EXPORT MASTER BARANG</button>
-            <button class="btn-success" style="width:100%; padding:12px; border-radius:8px; font-weight:bold; border:none; cursor:pointer;" onclick="exportData('trans')">⬇️ EXPORT LOG TRANSAKSI</button>
+            <p style="font-size:10px; color:#64748b; margin-top:-5px;">*Algoritma akan merekonstruksi nilai HPP (COGS) dan valuasi aset berdasarkan *cost flow assumption* yang dipilih secara *realtime*.</p>
         </div>
         <div class="card" style="border-top:3px solid var(--danger);">
-            <h3 style="color:var(--danger)">⚠️ Zona Berbahaya</h3>
-            <button class="btn-danger" style="width:100%;" onclick="resetData()">🗑️ FACTORY RESET (HAPUS SEMUA DATA)</button>
+            <h3 style="color:var(--danger)">⚠️ Database Control</h3>
+            <button class="btn-danger" style="width:100%; font-size:14px; padding:15px;" onclick="resetData()">🗑️ FACTORY RESET SYSTEM</button>
         </div>
     </div>
 
     <div style="text-align: center; padding: 20px; color: #94a3b8; font-size: 11px; font-weight: bold; letter-spacing: 1px; margin-bottom: 10px;">&copy; 2026 Ikram Cyber System</div>
 
     <nav class="bottom-nav">
-        <div class="nav-item active" onclick="bukaTab('home')"><div class="nav-icon">📊</div>DASH</div>
+        <div class="nav-item active" onclick="bukaTab('home')"><div class="nav-icon">🔬</div>ANALYTICS</div>
         <div class="nav-item" onclick="bukaTab('barang')"><div class="nav-icon">📦</div>SKU</div>
-        <div class="nav-item" onclick="bukaTab('trans')"><div class="nav-icon">🔄</div>LOGISTIK</div>
-        <div class="nav-item" onclick="bukaTab('seting')"><div class="nav-icon">⚙️</div>SETING</div>
+        <div class="nav-item" onclick="bukaTab('trans')"><div class="nav-icon">🔄</div>MUTASI</div>
+        <div class="nav-item" onclick="bukaTab('seting')"><div class="nav-icon">⚙️</div>PARAM</div>
     </nav>
 
     <script>
-        // INIT DB
-        // db_barang: [{kode, nama, kat, sat, min}] -> master data
-        // db_batch: [{kode, tgl, qty, harga, sisa}] -> engine untuk FIFO/LIFO
-        // db_trans: [{id, tgl, jenis, kode, qty, ket}] -> log murni
-        
+        // DATABASE SCHEMAS
         let db_barang = JSON.parse(localStorage.getItem('gm_barang')) || [];
         let db_batch = JSON.parse(localStorage.getItem('gm_batch')) || [];
         let db_trans = JSON.parse(localStorage.getItem('gm_trans')) || [];
@@ -192,15 +200,15 @@
         let now = new Date();
         let localIso = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString();
         let today = localIso.slice(0,10);
-        document.getElementById('dash-tgl').innerText = now.toLocaleDateString('id-ID', {weekday:'long', year:'numeric', month:'short', day:'numeric'});
+        document.getElementById('dash-tgl').innerText = now.toLocaleDateString('id-ID', {weekday:'short', year:'numeric', month:'short', day:'numeric'});
         setVal('t-tgl', today); document.getElementById('t-tgl').setAttribute('max', today);
 
         function formatRp(angka) { return "Rp " + angka.toLocaleString('id-ID'); }
 
-        function simpanSet() { 
-            localStorage.setItem('gm_pt', getVal('set-pt')); 
-            localStorage.setItem('gm_metode', getVal('set-metode')); 
-            refreshUI(); 
+        function simpanSet() {
+            localStorage.setItem('gm_pt', getVal('set-pt'));
+            localStorage.setItem('gm_metode', getVal('set-metode'));
+            refreshUI();
         }
 
         function toggleHargaInput() {
@@ -215,50 +223,51 @@
             setVal('b-kode', `${prefix}-${rand}`);
         }
 
-        // ENGINE: HITUNG STOK PER BARANG (DARI BATCH)
+        // SC CORE ENGINE: Calculate Stock
         function hitungStok(kode) {
-            let batches = db_batch.filter(x => x.kode === kode);
-            let sisa = 0;
-            batches.forEach(b => { sisa += b.sisa; });
-            return sisa;
+            return db_batch.filter(x => x.kode === kode).reduce((sum, b) => sum + b.sisa, 0);
         }
 
-        // ENGINE: VALUASI PER BARANG (FIFO / LIFO)
-        function hitungValuasi(kode, metode) {
-            let batches = db_batch.filter(x => x.kode === kode && x.sisa > 0);
-            // Secara default batch ditambahkan urut waktu. 
-            // Valuasi aset sebenarnya sama saja (Sisa Qty * Harga Batch), 
-            // FIFO/LIFO hanya berpengaruh saat barang keluar.
-            let nilai = 0;
-            batches.forEach(b => { nilai += (b.sisa * b.harga); });
-            return nilai;
+        // SC CORE ENGINE: Valuasi FIFO/LIFO
+        function hitungValuasi(kode) {
+            return db_batch.filter(x => x.kode === kode && x.sisa > 0).reduce((sum, b) => sum + (b.sisa * b.harga), 0);
         }
 
-        // MASTER BARANG
+        // SC CORE ENGINE: Calculate COGS (HPP) based on Cost Flow Assumption
+        function hitungCOGS() {
+            let cogs = 0;
+            // Rekonstruksi HPP dari log transaksi keluar (Kalkulasi dari cogs_total per transaksi jika disimpan, atau hitung realtime)
+            // Di versi ini kita ambil dari data transaksi yang menyimpan 'cogs_total'
+            db_trans.filter(x => x.jenis === 'KELUAR').forEach(t => {
+                cogs += (t.cogs_total || 0);
+            });
+            return cogs;
+        }
+
         function simpanBarang() {
             let kode = getVal('b-kode').toUpperCase(); let nama = getVal('b-nama');
             let stokAwal = getNum('b-stok'); let hargaAwal = getNum('b-harga');
 
-            if(!kode || !nama) return alert("Kode SKU dan Nama wajib diisi!");
-            
-            let obj = { kode: kode, nama: nama, kat: getVal('b-kat') || "Uncategorized", sat: getVal('b-sat') || "Pcs", min: getNum('b-min') };
+            if(!kode || !nama) return alert("Validation Error: Kode SKU dan Nama wajib diisi!");
+
+            let obj = { kode: kode, nama: nama, kat: getVal('b-kat') || "General", sat: getVal('b-sat') || "Pcs", min: getNum('b-min') };
             let isEdit = db_barang.findIndex(x => x.kode === kode);
 
             if(isEdit > -1) {
-                if(confirm("SKU Terdaftar! Update nama/kategori barang ini?")) { db_barang[isEdit] = obj; } else return;
-            } else { 
-                db_barang.push(obj); 
-                // Jika ada stok awal, buat batch pertama!
+                if(confirm("SKU Terdaftar! Update metadata barang ini?")) { db_barang[isEdit] = obj; } else return;
+            } else {
+                db_barang.push(obj);
                 if(stokAwal > 0) {
-                    db_batch.push({ kode: kode, tgl: today, qty: stokAwal, harga: hargaAwal, sisa: stokAwal });
-                    db_trans.push({ id: Date.now(), tgl: today, jenis: 'MASUK', kode: kode, qty: stokAwal, ket: 'Stok Awal (Setup)' });
+                    let batchId = Date.now();
+                    db_batch.push({ id: batchId, kode: kode, tgl: today, qty: stokAwal, harga: hargaAwal, sisa: stokAwal });
+                    db_trans.push({ id: Date.now(), tgl: today, jenis: 'MASUK', kode: kode, qty: stokAwal, ket: 'Initial Inventory Balance', cogs_total: 0 });
                 }
             }
-            
+
             localStorage.setItem('gm_barang', JSON.stringify(db_barang));
             localStorage.setItem('gm_batch', JSON.stringify(db_batch));
             localStorage.setItem('gm_trans', JSON.stringify(db_trans));
-            alert("Master SKU Tersimpan!"); batalEditBarang(); refreshUI();
+            alert("Master Data Updated!"); batalEditBarang(); refreshUI();
         }
 
         function editBarang(kode) {
@@ -287,7 +296,6 @@
             }
         }
 
-        // LOGIKA TRANSAKSI FIFO/LIFO
         function simpanTransaksi() {
             let tgl = getVal('t-tgl'); let jenis = getVal('t-jenis'); let kode = getVal('t-barang');
             let qty = getNum('t-qty'); let ket = getVal('t-ket') || "Logistik"; let hargaMasuk = getNum('t-harga');
@@ -297,155 +305,174 @@
             if(qty <= 0) return alert("Qty minimal 1!");
 
             let bIndex = db_barang.findIndex(x => x.kode === kode);
-            if(bIndex === -1) return alert("SKU tidak valid!");
+            if(bIndex === -1) return alert("SKU invalid!");
 
             let stokSaatIni = hitungStok(kode);
+            let transactionCogs = 0;
 
             if(jenis === 'MASUK') {
-                // Tambah Batch Baru
-                db_batch.push({ kode: kode, tgl: tgl, qty: qty, harga: hargaMasuk, sisa: qty });
+                db_batch.push({ id: Date.now(), kode: kode, tgl: tgl, qty: qty, harga: hargaMasuk, sisa: qty });
             } else {
-                // Proses Keluar (Kuras Batch berdasarkan FIFO/LIFO)
-                if(stokSaatIni < qty) return alert(`STOK KURANG! Sisa fisik hanya ${stokSaatIni}.`);
+                if(stokSaatIni < qty) return alert(`STOCK OUT WARNING! Sisa fisik hanya ${stokSaatIni}.`);
 
                 let sisaKurang = qty;
                 let availableBatches = db_batch.filter(x => x.kode === kode && x.sisa > 0);
-                
-                // Urutkan Batch: FIFO (Lama->Baru), LIFO (Baru->Lama)
+
                 if(metode === "FIFO") {
-                    availableBatches.sort((a,b) => new Date(a.tgl) - new Date(b.tgl));
+                    availableBatches.sort((a,b) => new Date(a.tgl) - new Date(b.tgl) || a.id - b.id);
                 } else {
-                    availableBatches.sort((a,b) => new Date(b.tgl) - new Date(a.tgl));
+                    availableBatches.sort((a,b) => new Date(b.tgl) - new Date(a.tgl) || b.id - a.id);
                 }
 
                 for(let i=0; i<availableBatches.length; i++) {
                     if(sisaKurang <= 0) break;
                     let b = availableBatches[i];
                     if(b.sisa >= sisaKurang) {
+                        transactionCogs += (sisaKurang * b.harga); // Hitung HPP
                         b.sisa -= sisaKurang;
                         sisaKurang = 0;
                     } else {
+                        transactionCogs += (b.sisa * b.harga); // Hitung HPP
                         sisaKurang -= b.sisa;
                         b.sisa = 0;
                     }
                 }
             }
 
-            db_trans.push({ id: Date.now(), tgl: tgl, jenis: jenis, kode: kode, qty: qty, ket: ket });
+            db_trans.push({ id: Date.now(), tgl: tgl, jenis: jenis, kode: kode, qty: qty, ket: ket, cogs_total: transactionCogs });
             localStorage.setItem('gm_trans', JSON.stringify(db_trans));
-            localStorage.setItem('gm_batch', JSON.stringify(db_batch)); // Update state batch
-            
-            alert(`Mutasi ${jenis} berhasil diposting!`);
+            localStorage.setItem('gm_batch', JSON.stringify(db_batch));
+
+            alert(`Mutasi ${jenis} sukses diposting!`);
             setVal('t-qty', 1); setVal('t-harga', 0); setVal('t-ket', ''); refreshUI();
         }
 
-        // RENDER UI
         function renderChart(inQty, outQty) {
             const ctx = document.getElementById('stokChart').getContext('2d');
             if(chartInstance) chartInstance.destroy();
             chartInstance = new Chart(ctx, {
                 type: 'bar',
-                data: { labels: ['Barang Masuk (In)', 'Barang Keluar (Out)'], datasets: [{ data: [inQty, outQty], backgroundColor: ['#10b981', '#e11d48'], borderRadius: 6 }] },
+                data: { labels: ['Inbound (Masuk)', 'Outbound (Keluar)'], datasets: [{ data: [inQty, outQty], backgroundColor: ['#10b981', '#e11d48'], borderRadius: 6 }] },
                 options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
             });
         }
 
+        // PROFESSOR LEVEL ANALYTICS: ABC Classification (Pareto)
+        function generateABCAnalysis(itemsValuation, totalVal) {
+            if(totalVal === 0) return "<i>Belum ada valuasi aset.</i>";
+            
+            // Sort Descending by Valuation
+            itemsValuation.sort((a,b) => b.val - a.val);
+            
+            let cumulative = 0;
+            let html = "<table><tr><th>Class</th><th>SKU & Item</th><th>% Valuasi</th></tr>";
+            
+            itemsValuation.forEach(x => {
+                if(x.val === 0) return;
+                cumulative += x.val;
+                let pct = (cumulative / totalVal) * 100;
+                let itemPct = (x.val / totalVal) * 100;
+                
+                let cls = 'C', badgeCls = 'abc-c';
+                if(pct <= 70) { cls = 'A'; badgeCls = 'abc-a'; }
+                else if(pct <= 90) { cls = 'B'; badgeCls = 'abc-b'; }
+                
+                html += `<tr>
+                    <td align="center"><span class="badge ${badgeCls}">Class ${cls}</span></td>
+                    <td><b>${x.kode}</b><br><span style="font-size:9px;">${x.nama}</span></td>
+                    <td><b>${itemPct.toFixed(1)}%</b><br><span style="font-size:9px; color:#64748b;">Kumulatif: ${pct.toFixed(1)}%</span></td>
+                </tr>`;
+            });
+            return html + "</table>";
+        }
+
         function refreshUI() {
-            let pt = localStorage.getItem('gm_pt') || 'GUDANG UTAMA ENTERPRISE';
+            let pt = localStorage.getItem('gm_pt') || 'ENTERPRISE WMS';
             let metode = localStorage.getItem('gm_metode') || 'FIFO';
             document.getElementById('dash-pt').innerText = pt.toUpperCase();
-            document.getElementById('set-pt').value = pt.includes('GUDANG UTAMA') ? '' : pt;
+            document.getElementById('set-pt').value = pt.includes('ENTERPRISE WMS') ? '' : pt;
             document.getElementById('set-metode').value = metode;
             document.getElementById('v-metode').innerText = metode;
 
-            // Hitung Semua Stok & Valuasi
             let totalValuasi = 0;
             let stokTipisData = [];
+            let itemsValuation = [];
             let optBarang = "<option value=''>-- Pilih / Scan Barcode SKU --</option>";
             let cari = getVal('cari-barang').toLowerCase();
-            let h_barang = "<table><tr><th>Data SKU</th><th>Stok Fisik</th><th>Aset (Valuasi)</th><th>Aksi</th></tr>";
+            let h_barang = "<table><tr><th>Data SKU</th><th>Stok (Fisik)</th><th>Aset Valuasi</th></tr>";
 
             document.getElementById('v-tot-barang').innerText = db_barang.length;
 
             db_barang.forEach(x => {
                 let curStok = hitungStok(x.kode);
-                let curVal = hitungValuasi(x.kode, metode);
+                let curVal = hitungValuasi(x.kode);
                 totalValuasi += curVal;
                 
-                if(curStok <= x.min) stokTipisData.push({kode: x.kode, nama: x.nama, stok: curStok, sat: x.sat});
-                
+                itemsValuation.push({ kode: x.kode, nama: x.nama, val: curVal });
+
+                if(curStok <= x.min) stokTipisData.push({kode: x.kode, nama: x.nama, stok: curStok, sat: x.sat, min: x.min});
+
                 optBarang += `<option value="${x.kode}">${x.kode} - ${x.nama} [Stok: ${curStok}]</option>`;
 
                 if(x.nama.toLowerCase().includes(cari) || x.kode.toLowerCase().includes(cari) || x.kat.toLowerCase().includes(cari)) {
                     let wrn = curStok <= x.min ? 'bg-danger' : 'bg-success';
                     h_barang += `<tr>
-                        <td><b style="color:var(--dark);">${x.kode}</b><br><b>${x.nama}</b><br><span style="color:#64748b; font-size:9px;">${x.kat.toUpperCase()}</span></td>
-                        <td align="center"><span class='badge ${wrn}'>${curStok}</span><br><span style="font-size:9px; font-weight:bold;">${x.sat}</span></td>
-                        <td><span style="font-size:10px; color:var(--dark); font-weight:bold;">${formatRp(curVal)}</span></td>
-                        <td align="center">
-                            <button class='btn-sm btn-main' onclick='editBarang("${x.kode}")'>✏️</button>
-                            <button class='btn-sm btn-danger' style="margin-top:4px;" onclick='hapusBarang("${x.kode}")'>🗑️</button>
-                        </td>
+                        <td><b style="color:var(--dark); font-size:13px;">${x.kode}</b><br><b>${x.nama}</b><br><span style="color:#64748b; font-size:9px;">${x.kat.toUpperCase()}</span></td>
+                        <td align="center"><span class='badge ${wrn}'>${curStok} ${x.sat}</span><br><button class='btn-sm btn-main' style="margin-top:6px;" onclick='editBarang("${x.kode}")'>EDIT / HAPUS</button></td>
+                        <td align="right"><span style="font-size:11px; color:var(--dark); font-weight:900;">${formatRp(curVal)}</span></td>
                     </tr>`;
                 }
             });
 
+            // UPDATE EXECUTIVE METRICS
             document.getElementById('v-valuasi').innerText = formatRp(totalValuasi);
             document.getElementById('v-tot-tipis').innerText = stokTipisData.length;
+            
+            // Calculate COGS & Inventory Turnover Ratio (ITR)
+            let totalCogs = hitungCOGS();
+            document.getElementById('v-cogs').innerText = formatRp(totalCogs);
+            
+            // ITR = COGS / Average Inventory (Simplified to current inventory for live dashboard)
+            let itr = totalValuasi > 0 ? (totalCogs / totalValuasi).toFixed(2) : 0;
+            document.getElementById('v-itr').innerText = itr + "x";
+
+            // Render ABC Analysis
+            document.getElementById('view-abc').innerHTML = generateABCAnalysis(itemsValuation, totalValuasi);
+
             document.getElementById('view-barang').innerHTML = h_barang + "</table>";
             document.getElementById('t-barang').innerHTML = optBarang;
 
             // Alert Tipis
-            let h_alert = "<table><tr><th>SKU / Nama</th><th>Stok Fisik</th><th>Sisa</th></tr>";
-            if(stokTipisData.length === 0) h_alert += "<tr><td colspan='3' align='center' style='color:var(--success); font-weight:bold;'>✅ Inventory Level Aman</td></tr>";
-            stokTipisData.forEach(x => { h_alert += `<tr><td><b>${x.kode}</b><br><span style="font-size:10px;">${x.nama}</span></td><td align="center"><span class='badge bg-danger'>${x.stok}</span></td><td align="center">${x.sat}</td></tr>`; });
+            let h_alert = "<table><tr><th>SKU / Item</th><th>Stok Fisik</th><th>Batas (ROP)</th></tr>";
+            if(stokTipisData.length === 0) h_alert += "<tr><td colspan='3' align='center' style='color:var(--success); font-weight:bold;'>✅ Level Inventaris Aman</td></tr>";
+            stokTipisData.forEach(x => { h_alert += `<tr><td><b>${x.kode}</b><br><span style="font-size:10px;">${x.nama}</span></td><td align="center"><span class='badge bg-danger'>${x.stok}</span></td><td align="center"><b>${x.min}</b></td></tr>`; });
             document.getElementById('view-alert').innerHTML = h_alert + "</table>";
 
             // Transaksi & Chart
             let blnIni = today.slice(0,7);
             let inQty = 0, outQty = 0;
-            let h_trans = "<table><tr><th>Tanggal/Ref</th><th>SKU Barang</th><th>Mutasi</th></tr>";
-            
+            let h_trans = "<table><tr><th>Log Info</th><th>SKU Barang</th><th>Mutasi Qty</th></tr>";
+
             let transSorted = db_trans.slice().sort((a,b)=>b.id-a.id);
-            document.getElementById('v-tot-trans').innerText = transSorted.filter(x => x.tgl.startsWith(blnIni)).length;
 
             transSorted.slice(0, 50).forEach(x => {
                 if(x.tgl.startsWith(blnIni)) { if(x.jenis === 'MASUK') inQty += x.qty; else outQty += x.qty; }
                 let b = db_barang.find(y => y.kode === x.kode);
-                let badge = x.jenis === 'MASUK' ? "<span class='badge bg-success'>+ IN</span>" : "<span class='badge bg-danger'>- OUT</span>";
+                let badge = x.jenis === 'MASUK' ? "<span class='badge bg-success'>IN</span>" : "<span class='badge bg-danger'>OUT</span>";
+                let cogsTxt = x.jenis === 'KELUAR' ? `<br><span style="font-size:9px; color:#be123c;">HPP: ${formatRp(x.cogs_total)}</span>` : "";
+                
                 h_trans += `<tr>
                     <td><b>${x.tgl.slice(8)}/${x.tgl.slice(5,7)}/${x.tgl.slice(0,4)}</b><br><span style="font-size:9px; color:#64748b;">${x.ket}</span></td>
-                    <td><b style="color:var(--dark);">${x.kode}</b><br><span style="font-size:10px;">${b?b.nama:'[Dihapus]'}</span></td>
-                    <td align="center">${badge}<br><b style="font-size:14px;">${x.qty}</b></td>
+                    <td><b style="color:var(--dark);">${x.kode}</b><br><span style="font-size:10px;">${b?b.nama:'[Deleted]'}</span></td>
+                    <td align="center">${badge}<br><b style="font-size:14px;">${x.qty}</b>${cogsTxt}</td>
                 </tr>`;
             });
             document.getElementById('view-trans').innerHTML = h_trans + "</table>";
             renderChart(inQty, outQty);
         }
 
-        function exportData(jenis) {
-            let csv = ""; let fn = ""; let mt = localStorage.getItem('gm_metode') || 'FIFO';
-            if(jenis === 'barang') {
-                csv = `SKU KODE,NAMA BARANG,KATEGORI,SATUAN,STOK FISIK,VALUASI ASET (${mt})\n`;
-                db_barang.forEach(x => { 
-                    let s = hitungStok(x.kode); let v = hitungValuasi(x.kode, mt);
-                    csv += `="${x.kode}","${x.nama}","${x.kat}","${x.sat}",${s},${v}\n`; 
-                });
-                fn = "WMS_Master_Asset_Valuation.csv";
-            } else {
-                csv = "TANGGAL,JENIS MUTASI,SKU KODE,NAMA BARANG,QUANTITY,KETERANGAN / REF\n";
-                db_trans.forEach(x => {
-                    let b = db_barang.find(y => y.kode === x.kode);
-                    csv += `${x.tgl},"${x.jenis}",="${x.kode}","${b?b.nama:'-'}",${x.qty},"${x.ket}"\n`;
-                });
-                fn = "WMS_Logistics_History.csv";
-            }
-            let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            let a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = fn; a.click();
-        }
-
         function resetData() {
-            if(confirm('CRITICAL WARNING: Seluruh database SKU, Batch Harga, dan Mutasi akan dihapus permanen. Lanjutkan?')) {
+            if(confirm('CRITICAL SYSTEM OVERRIDE: Menghapus database inventori secara permanen. Lanjutkan?')) {
                 localStorage.removeItem('gm_barang'); localStorage.removeItem('gm_trans'); localStorage.removeItem('gm_batch'); location.reload();
             }
         }
